@@ -1,0 +1,52 @@
+metadata:
+  name: atomic-consulta-saldo
+  annotations:
+    app.openshift.io/connects-to: mock-consulta-saldo
+  labels:
+    app.kubernetes.io/component: Atomic
+    app.kubernetes.io/part-of: piloto-colombia
+    app.openshift.io/runtime: quarkus
+spec:
+  template:
+    metadata:
+    spec:
+      volumes:
+        - name: applicationyamlfile
+          configMap:
+            name: atomic-consulta-saldo-configmap
+            defaultMode: 420
+      containers:
+        - name: atomic-consulta-saldo
+          command:
+            - java
+            - '-Dquarkus.http.host=0.0.0.0'
+            - '-Djava.util.logging.manager=org.jboss.logmanager.LogManager'
+            - '-jar'
+            - /deployments/quarkus-run.jar
+          volumeMounts:
+            - name: applicationyamlfile
+              readOnly: true
+              mountPath: /deployments/config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 200m
+              memory: 1Gi
+          env:
+          - name: TZ  
+            value: America/Bogota
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: JAVA_APP_JAR
+            value: /deployments/atomic-consulta-saldo-runner.jar
+# HOST KAFKA
+          - name: BROKERS
+            valueFrom:
+              configMapKeyRef:
+                name: atomic-consulta-saldo-configmap
+                key: brokers

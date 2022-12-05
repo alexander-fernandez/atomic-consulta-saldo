@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: atomic-consulta-saldo-configmap
+data:
+  brokers: 'kafka-test-kafka-brokers:9092'
+  be.host: mock-consulta-saldo
+  be.port: '8080'
